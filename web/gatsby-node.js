@@ -1,5 +1,5 @@
 const { isFuture } = require("date-fns");
-
+const crypto = require("crypto")
 const { format } = require("date-fns");
 
 async function createBlogPostPages(graphql, actions) {
@@ -264,6 +264,70 @@ async function createFeaturePages(graphql, actions) {
       });
   }
 
+  async function createHowToInvestPages(graphql, actions) {
+    const { createPage } = actions;
+    const result = await graphql(`
+    {
+      allSanityHowToInvestTransformed {
+        edges {
+          node {
+            id
+            title
+            slug {
+              current
+            }
+          }
+        }
+      }
+    }
+    `);
+  
+    if (result.errors) throw result.errors;
+    const edges = (result.data.allSanityHowToInvestTransformed || {}).edges || [];
+  
+    edges
+      .filter((edge) => !isFuture(edge.node.publishedAt))
+      .forEach( edge => {
+        const { id, slug = {}} = edge.node;
+        const path = `/${slug.current}/`;
+  
+        createPage({
+          path,
+          component: require.resolve("./src/templates/how-to-invest.js"),
+          context: { id },
+        });
+      });
+  }
+
+
+function createHowToInvestNodes ({ node, getNode, actions }) {
+  const { createNode } = actions
+  if (node.internal.type === `SanityHowToInvest`) {
+    node.values.map( ({investedAmount, expectedReturn})=>{
+      const replaceTemplateValues = _ => _.replace(/@{{investedAmount}}|@{{investedamount}}/g,investedAmount).replace(/@{{expectedReturn}}|@{{expectedReturn}}/g,expectedReturn)
+      const transformedBody = replaceTemplateValues(node.body);
+      createNode({
+        ...node,
+        id : `${node.id}-${investedAmount}`,
+        parent : node.id,
+        body : transformedBody,
+        children : [],
+        title : replaceTemplateValues(node.title),
+        slug : {
+          ...node.slug,
+          current : replaceTemplateValues(node.slug.current),
+        },
+        internal : {
+          type : `SanityHowToInvestTransformed`,
+          contentDigest: crypto
+          .createHash(`md5`)
+          .update(JSON.stringify(transformedBody))
+          .digest(`hex`),
+        }
+      })
+    })
+  }
+}
 
 exports.createPages = async ({ graphql, actions }) => {
   await createBlogPostPages(graphql, actions);
@@ -273,4 +337,10 @@ exports.createPages = async ({ graphql, actions }) => {
   await createDataPages(graphql, actions);
   await createModelPortfolios(graphql, actions);
   await createFeaturePages(graphql, actions);
+  await createHowToInvestPages(graphql, actions);
 };
+
+
+exports.onCreateNode = ({ node, getNode, actions }) => {
+  createHowToInvestNodes({ node, getNode, actions })
+}
