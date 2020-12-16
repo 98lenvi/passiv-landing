@@ -10,6 +10,7 @@ import {responsiveTitle3} from './typography.module.css'
 
 function BlogPostPreview (props) {
   return (
+    <div>
     <Link
       className={props.isInList ? styles.inList : styles.inGrid}
       to={`/blog/${props.slug.current}/`}
@@ -31,6 +32,7 @@ function BlogPostPreview (props) {
         <div className={styles.date}>{format(props.publishedAt, 'MMMM Do, YYYY')}</div>
       </div>
     </Link>
+    </div>
   )
 }
 

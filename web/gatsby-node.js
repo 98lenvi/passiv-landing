@@ -264,6 +264,43 @@ async function createFeaturePages(graphql, actions) {
       });
   }
 
+  async function createBlogCategoryPages(graphql, actions) {
+    const { createPage } = actions;
+    const result = await graphql(`
+    {
+      allSanityPost(filter: {slug: {current: {ne: null}}, publishedAt: {ne: null}}) {
+        edges {
+          node {
+            publishedAt
+            postType
+          }
+        }
+      }
+    }
+    `);
+  
+    if (result.errors) throw result.errors;
+  
+    const postEdges = (result.data.allSanityPost || {}).edges || [];
+
+    const categories = postEdges
+      .filter((edge) => !isFuture(edge.node.publishedAt))
+      .reduce( (acc,{node : { postType}}) => {
+      if(!postType)
+        return
+      acc.some(_=>_===postType) ? acc : [...acc, postType]
+      },[])
+    
+    categories
+      .forEach( category => {
+        const path = `/${category}/`;
+        createPage({
+          path,
+          component: require.resolve("./src/templates/blog-category-page.js"),
+          context: { category },
+        });
+      });
+  }
 
 exports.createPages = async ({ graphql, actions }) => {
   await createBlogPostPages(graphql, actions);
@@ -273,4 +310,5 @@ exports.createPages = async ({ graphql, actions }) => {
   await createDataPages(graphql, actions);
   await createModelPortfolios(graphql, actions);
   await createFeaturePages(graphql, actions);
+  await createBlogCategoryPages(graphql, actions);
 };

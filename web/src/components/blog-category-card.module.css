@@ -19,31 +19,25 @@
   }
 }
 
-.inGrid {
-  composes: root;
-}
-
 .leadMediaThumb {
-  position: relative;
-  padding-bottom: 66.666%;
-  background: var(--color-very-light-gray);
-
-  @nest & img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+  display: flex;
+  height: 100%;
+  margin: auto;
+  justify-content: flex-start;
+  align-items: center;
+  background: #04A287;
+  color: #ffffff;
 }
 
 .text {
-  padding: 0 20px 30px 20px;
+  padding: 0 20px;
+  height: 100%;
+
 }
 
 .title {
-
+  padding-left: 20px;
+  text-align: left;
   @media (--media-min-medium) {
     @nest .inList & {
       margin-top: 0;

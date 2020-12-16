@@ -140,3 +140,7 @@
     line-height: var(--font-large-line-height);
   }
 }
+
+.capitalize {
+  text-transform: capitalize;
+}

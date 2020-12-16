@@ -4,13 +4,13 @@
 @import '../styles/btn.css';
 
 .root {
-  padding: 5em 0;
+  padding: 2em 0;
   @nest & h2 {
     font-size: 42px;
     margin-bottom: 35px;
     @media (--media-max-tablet) {
       line-height: 1.2;
-      text-align: center;
+      text-align: left;
     }
   }
 }
@@ -32,22 +32,80 @@
   }
 }
 
-.col3 {
+.col3>ul {
   list-style: none;
   justify-content: space-between;
 }
 
-.item {
-  @media (--media-min-tablet) {
-    width: 32%;
-  }
-  margin-bottom: 20px;
-  background: #fff;
-  padding-bottom: 22px;
+.item>div {
+  width: 90%;
+  height: 90%;
+  margin: 0px clamp(1px,5vw,32px) 40px clamp(1px,5vw,32px);
+  background: #ffffff;
   border-radius: 4px;
   box-shadow: 0 2px 20px 0 rgba(119, 119, 119, 0.12);
 }
 
+.item:hover {
+  transform: translateY(-10px);  
+  transition: 0.1s ease-in-out;
+}
+
 .btn1 {
   display: inline-block;
+}
+
+.carouselbutton {
+  background-color: #fff;
+  border-radius: 50%;
+  color: #909090;
+  border: none;
+  padding : 4px 9px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 10px;
+  box-shadow: 0 2px 20px 0 rgba(119, 119, 119, 0.12);
+  cursor: pointer;
+}
+
+.carouselbutton:focus{
+  outline: none;
+}
+
+.carouselbutton > svg {
+  color: inherit;
+}
+
+.carouselbuttongroup {
+  display: flex;
+  position: absolute;
+  bottom: 0;
+  left: 40px;
+}
+
+.carouselbutton:nth-child(1) > svg {
+  transform: rotate(180deg);
+}
+
+.carouselbuttondisabled{
+  opacity: 0.5;
+  cursor: no-drop;
+}
+
+.carouselroot {
+  overflow: visible !important;
+}
+
+.carouselroot>ul>li:nth-child(1){
+  @media (--media-max-tablet) {
+    display: none;
+  }
+}
+
+.titleMobile {
+  display: none;
+  @media (--media-max-tablet) {
+    display: block;
+  }
 }

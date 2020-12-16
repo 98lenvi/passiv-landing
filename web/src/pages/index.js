@@ -48,7 +48,6 @@ export const query = graphql`
       keywords
     }
     posts: allSanityPost(
-      limit: 3
       sort: { fields: [publishedAt], order: DESC }
       filter: { slug: { current: { ne: null } }, publishedAt: { ne: null } }
     ) {
@@ -60,6 +59,7 @@ export const query = graphql`
             ...SanityImage
             alt
           }
+          postType
           title
           _rawExcerpt
           slug {
@@ -88,6 +88,8 @@ const IndexPage = props => {
       .filter(filterOutDocsWithoutSlugs)
       .filter(filterOutDocsPublishedInTheFuture)
     : []
+  const categories = postNodes
+    .reduce( (acc,{postType}) => acc.some(_=>_===postType) ? acc : [...acc, postType],[])
 
   if (!site) {
     throw new Error(
@@ -107,13 +109,20 @@ const IndexPage = props => {
       <Features/>
       <Testimonials/>
       <Container>
-        {postNodes && (
-          <BlogPostPreviewList
-            title='Latest Posts'
-            nodes={postNodes}
-            browseMoreHref='/blog/'
-          />
-        )}
+      {categories.map( category => {
+        const posts = postNodes.filter( post => post.postType === category)
+        const title = category ? category.replace(/-/g," ") : 'Blog';
+        const href = category ? `/${category}` : '/blog';
+        if(posts.length > 0)
+          return(
+            <BlogPostPreviewList
+              title={title}
+              nodes={posts}
+              browseMoreHref={href}
+            />
+          )
+      })
+      }
       </Container>
       <Security/>
     </Layout>
